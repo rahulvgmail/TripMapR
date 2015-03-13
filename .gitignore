@@ -3,6 +3,9 @@
 *.pyc
 __pycache__
 
+#media
+*.jpg
+/TripMapR/media/*
 # Logs
 *.log
 pip-log.txt

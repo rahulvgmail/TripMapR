@@ -42,6 +42,10 @@ class Common(Configuration):
         'allauth',  # registration
         'allauth.account',  # registration
         'allauth.socialaccount',  # registration
+        'photologue', #photologue
+        'sortedm2m',  #sorted many to many relations
+
+
     )
 
     # Apps specific for this project go here.
