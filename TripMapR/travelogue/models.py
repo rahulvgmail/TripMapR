@@ -212,7 +212,7 @@ class Travelogue(models.Model):
         return self.title
 
     def get_absolute_url(self):
-        return reverse('Travelogue:pl-Travelogue', args=[self.slug])
+        return reverse('travelogue:pl-travelogue', args=[self.slug])
 
     def latest(self, limit=LATEST_LIMIT, public=True):
         if not limit:
@@ -553,7 +553,7 @@ class Photo(ImageModel):
         super(Photo, self).save(*args, **kwargs)
 
     def get_absolute_url(self):
-        return reverse('Travelogue:pl-photo', args=[self.slug])
+        return reverse('travelogue:pl-photo', args=[self.slug])
 
     def public_Travelogues(self):
         """Return the public Travelogues to which this photo belongs."""

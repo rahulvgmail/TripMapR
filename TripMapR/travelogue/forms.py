@@ -25,7 +25,7 @@ from django.core.files.base import ContentFile
 
 from .models import Travelogue, Photo
 
-logger = logging.getLogger('photologue.forms')
+logger = logging.getLogger('traveloguelogue.forms')
 
 
 class UploadZipForm(forms.Form):

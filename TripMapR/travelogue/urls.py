@@ -10,7 +10,7 @@ from .views import PhotoListView, PhotoDetailView, TravelogueListView, \
     PhotoDayArchiveOldView, PhotoMonthArchiveOldView
 
 """NOTE: the url names are changing. In the long term, I want to remove the 'pl-'
-prefix on all urls, and instead rely on an application namespace 'photologue'.
+prefix on all urls, and instead rely on an application namespace 'Travelogue'.
 
 At the same time, I want to change some URL patterns, e.g. for pagination. Changing the urls
 twice within a few releases, could be confusing, so instead I am updating URLs bit by bit.
@@ -38,8 +38,8 @@ urlpatterns = patterns('',
                            TravelogueArchiveIndexView.as_view(),
                            name='pl-travelogue-archive'),
                        url(r'^$',
-                           RedirectView.as_view(url=reverse_lazy('photologue:pl-travelogue-archive')),
-                           name='pl-photologue-root'),
+                           RedirectView.as_view(url=reverse_lazy('travelogue:pl-travelogue-archive')),
+                           name='pl-travelogue-root'),
                        url(r'^travelogue/(?P<slug>[\-\d\w]+)/$',
                            TravelogueDetailView.as_view(), name='pl-travelogue'),
                        url(r'^traveloguelist/$',

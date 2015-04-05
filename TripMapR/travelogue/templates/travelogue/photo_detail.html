@@ -1,5 +1,5 @@
-{% extends "photologue/root.html" %}
-{% load photologue_tags i18n %}
+{% extends "travelogue/root.html" %}
+{% load travelogue_tags i18n %}
 
 {% block title %}{{ object.title }}{% endblock %}
 
@@ -21,11 +21,11 @@
             {% if object.public_galleries %}
                 <p>{% trans "This photo is found in the following galleries" %}:</p>
                 <table>
-                    {% for gallery in object.public_galleries %}
+                    {% for travelogue in object.public_galleries %}
                         <tr>
-                            <td>{% previous_in_gallery object gallery %}</td>
-	                        <td class="text-center"><a href="{{ gallery.get_absolute_url }}">{{ gallery.title }}</a></td>
-	                        <td>{% next_in_gallery object gallery %}</td>
+                            <td>{% previous_in_travelogue object travelogue %}</td>
+	                        <td class="text-center"><a href="{{ travelogue.get_absolute_url }}">{{ travelogue.title }}</a></td>
+	                        <td>{% next_in_travelogue object travelogue %}</td>
                         </tr>
 					{% endfor %}
 				</table>

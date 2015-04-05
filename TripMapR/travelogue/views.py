@@ -149,7 +149,7 @@ class TravelogueDateDetailOldView(DeprecatedMonthMixin, RedirectView):
 
     def get_redirect_url(self, *args, **kwargs):
         super(TravelogueDateDetailOldView, self).get_redirect_url(*args, **kwargs)
-        return reverse('photologue:travelogue-detail', kwargs={'year': kwargs['year'],
+        return reverse('travelogue:travelogue-detail', kwargs={'year': kwargs['year'],
                                                             'month': self.month_names[kwargs['month']],
                                                             'day': kwargs['day'],
                                                             'slug': kwargs['slug']})
@@ -159,7 +159,7 @@ class TravelogueDayArchiveOldView(DeprecatedMonthMixin, RedirectView):
 
     def get_redirect_url(self, *args, **kwargs):
         super(TravelogueDayArchiveOldView, self).get_redirect_url(*args, **kwargs)
-        return reverse('photologue:travelogue-archive-day', kwargs={'year': kwargs['year'],
+        return reverse('travelogue:travelogue-archive-day', kwargs={'year': kwargs['year'],
                                                                  'month': self.month_names[kwargs['month']],
                                                                  'day': kwargs['day']})
 
@@ -168,7 +168,7 @@ class TravelogueMonthArchiveOldView(DeprecatedMonthMixin, RedirectView):
 
     def get_redirect_url(self, *args, **kwargs):
         super(TravelogueMonthArchiveOldView, self).get_redirect_url(*args, **kwargs)
-        return reverse('photologue:travelogue-archive-month', kwargs={'year': kwargs['year'],
+        return reverse('travelogue:travelogue-archive-month', kwargs={'year': kwargs['year'],
                                                                    'month': self.month_names[kwargs['month']]})
 
 
@@ -176,7 +176,7 @@ class PhotoDateDetailOldView(DeprecatedMonthMixin, RedirectView):
 
     def get_redirect_url(self, *args, **kwargs):
         super(PhotoDateDetailOldView, self).get_redirect_url(*args, **kwargs)
-        return reverse('photologue:photo-detail', kwargs={'year': kwargs['year'],
+        return reverse('travelogue:photo-detail', kwargs={'year': kwargs['year'],
                                                           'month': self.month_names[kwargs['month']],
                                                           'day': kwargs['day'],
                                                           'slug': kwargs['slug']})
@@ -186,7 +186,7 @@ class PhotoDayArchiveOldView(DeprecatedMonthMixin, RedirectView):
 
     def get_redirect_url(self, *args, **kwargs):
         super(PhotoDayArchiveOldView, self).get_redirect_url(*args, **kwargs)
-        return reverse('photologue:photo-archive-day', kwargs={'year': kwargs['year'],
+        return reverse('travelogue:photo-archive-day', kwargs={'year': kwargs['year'],
                                                                'month': self.month_names[kwargs['month']],
                                                                'day': kwargs['day']})
 
@@ -195,5 +195,5 @@ class PhotoMonthArchiveOldView(DeprecatedMonthMixin, RedirectView):
 
     def get_redirect_url(self, *args, **kwargs):
         super(PhotoMonthArchiveOldView, self).get_redirect_url(*args, **kwargs)
-        return reverse('photologue:photo-archive-month', kwargs={'year': kwargs['year'],
+        return reverse('travelogue:photo-archive-month', kwargs={'year': kwargs['year'],
                                                                  'month': self.month_names[kwargs['month']]})

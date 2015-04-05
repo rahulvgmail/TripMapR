@@ -205,7 +205,7 @@ class PhotoAdmin(admin.ModelAdmin):
         custom_urls = patterns('',
                                url(r'^upload_zip/$',
                                    self.admin_site.admin_view(self.upload_zip),
-                                   name='photologue_upload_zip')
+                                   name='travelogue_upload_zip')
                                )
         return custom_urls + urls
 
@@ -230,7 +230,7 @@ class PhotoAdmin(admin.ModelAdmin):
         context['adminform'] = helpers.AdminForm(form,
                                                  list([(None, {'fields': form.base_fields})]),
                                                  {})
-        return render(request, 'admin/photologue/photo/upload_zip.html', context)
+        return render(request, 'admin/travlogue/photo/upload_zip.html', context)
 
 
 admin.site.register(Photo, PhotoAdmin)
