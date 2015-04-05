@@ -1,0 +1,31 @@
+{% extends "travelogue/root.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "All travelogues" %}{% endblock %}
+
+{% block content %}
+
+    <div class="row col-lg-12">
+        <h1 class="page-header">{% trans "All travelogues" %}</h1>
+    </div>
+
+    {% if object_list %}
+        {% for travelogue in object_list %}
+            <div class="row col-lg-12">
+                <h2><a href="{{ travelogue.get_absolute_url }}">{{ travelogue.title }}</a></h2>
+                <p class="muted"><small>{% trans "Published" %} {{ travelogue.date_added }}</small></p>
+                {% if travelogue.description %}<p>{{ travelogue.description|safe }}</p>{% endif %}
+                {% for photo in travelogue.sample %}
+                    <a href="{{ photo.get_absolute_url }}">
+                         <img src="{{ photo.get_thumbnail_url }}" class="thumbnail" alt="{{ photo.title }}">
+                    </a>
+                {% endfor %}
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="row col-lg-12">{% trans "No travelogues were found" %}.</div>
+    {% endif %}
+
+    {% include "travelogue/includes/paginator.html" %}
+    
+{% endblock %}

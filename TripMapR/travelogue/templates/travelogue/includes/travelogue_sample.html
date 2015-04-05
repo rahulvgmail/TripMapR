@@ -1,0 +1,17 @@
+{% load i18n %}
+
+{# Display a randomnly-selected set of photos from a given travelogue #}
+
+<div>
+    
+    <h2><a href="{{ travelogue.get_absolute_url }}">{{ travelogue.title }}</a></h2>
+    <p class="muted"><small>{% trans "Published" %} {{ travelogue.date_added }}</small></p>
+    {% if travelogue.description %}<p>{{ travelogue.description|safe }}</p>{% endif %}
+    
+    {% for photo in travelogue.sample %}
+        <a href="{{ photo.get_absolute_url }}">
+             <img src="{{ photo.get_thumbnail_url }}" class="thumbnail" alt="{{ photo.title }}">
+        </a>
+	{% endfor %}
+
+</div>
