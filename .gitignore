@@ -5,6 +5,9 @@ __pycache__
 
 #media
 *.jpg
+*.JPEG
+*.JPG
+*.BMP
 /TripMapR/media/*
 # Logs
 *.log
