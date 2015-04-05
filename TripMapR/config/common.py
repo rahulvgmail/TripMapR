@@ -29,6 +29,7 @@ class Common(Configuration):
         'django.contrib.sites',
         'django.contrib.messages',
         'django.contrib.staticfiles',
+        'django.contrib.sitemaps',
 
         # Useful template tags:
         # 'django.contrib.humanize',
@@ -42,7 +43,7 @@ class Common(Configuration):
         'allauth',  # registration
         'allauth.account',  # registration
         'allauth.socialaccount',  # registration
-        'photologue', #photologue
+     #   'photologue', #photologue
         'sortedm2m',  #sorted many to many relations
 
 
@@ -52,6 +53,7 @@ class Common(Configuration):
     LOCAL_APPS = (
         'users',  # custom users app
         # Your stuff: custom apps go here
+        'travelogue',
     )
 
     # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps

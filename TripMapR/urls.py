@@ -30,7 +30,7 @@ urlpatterns = patterns('',
 
     # Your stuff: custom urls go here
 
-    #photologe URL 
-    url(r'^photologue/', include('photologue.urls', namespace='photologue')),
+    #travelogue URL 
+    url(r'^travelogue/', include('travelogue.urls', namespace='travelogue')),
 
 ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
