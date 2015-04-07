@@ -18,10 +18,10 @@
 		    </a>
         </div>
         <div class="col-md-6">
-            {% if object.public_galleries %}
+            {% if object.public_travelogues %}
                 <p>{% trans "This photo is found in the following galleries" %}:</p>
                 <table>
-                    {% for travelogue in object.public_galleries %}
+                    {% for travelogue in object.public_travelogues %}
                         <tr>
                             <td>{% previous_in_travelogue object travelogue %}</td>
 	                        <td class="text-center"><a href="{{ travelogue.get_absolute_url }}">{{ travelogue.title }}</a></td>

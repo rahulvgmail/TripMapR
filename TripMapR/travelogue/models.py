@@ -69,53 +69,53 @@ except ImportError:
     # Tell South how to handle this custom field.
     if django.VERSION[:2] < (1, 7):
         from south.modelsinspector import add_introspection_rules
-        add_introspection_rules([], ["^Travelogue\.models\.TagField"])
+        add_introspection_rules([], ["^travelogue\.models\.TagField"])
 
 from .utils import EXIF
 from .utils.reflection import add_reflection
 from .utils.watermark import apply_watermark
 from .managers import TravelogueQuerySet, PhotoQuerySet
 
-logger = logging.getLogger('Travelogue.models')
+logger = logging.getLogger('travelogue.models')
 
 # Default limit for Travelogue.latest
-LATEST_LIMIT = getattr(settings, 'Travelogue_Travelogue_LATEST_LIMIT', None)
+LATEST_LIMIT = getattr(settings, 'TRAVELOGUE_TRAVELOGUE_LATEST_LIMIT', None)
 
 # Number of random images from the Travelogue to display.
-SAMPLE_SIZE = getattr(settings, 'Travelogue_Travelogue_SAMPLE_SIZE', 5)
+SAMPLE_SIZE = getattr(settings, 'TRAVELOGUE_TRAVELOGUE_SAMPLE_SIZE', 5)
 
 # max_length setting for the ImageModel ImageField
-IMAGE_FIELD_MAX_LENGTH = getattr(settings, 'Travelogue_IMAGE_FIELD_MAX_LENGTH', 100)
+IMAGE_FIELD_MAX_LENGTH = getattr(settings, 'TRAVELOGUE_IMAGE_FIELD_MAX_LENGTH', 100)
 
 # Path to sample image
-SAMPLE_IMAGE_PATH = getattr(settings, 'Travelogue_SAMPLE_IMAGE_PATH', os.path.join(
+SAMPLE_IMAGE_PATH = getattr(settings, 'TRAVELOGUE_SAMPLE_IMAGE_PATH', os.path.join(
     os.path.dirname(__file__), 'res', 'sample.jpg'))
 
 # Modify image file buffer size.
-ImageFile.MAXBLOCK = getattr(settings, 'Travelogue_MAXBLOCK', 256 * 2 ** 10)
+ImageFile.MAXBLOCK = getattr(settings, 'TRAVELOGUE_MAXBLOCK', 256 * 2 ** 10)
 
 # Travelogue image path relative to media root
-Travelogue_DIR = getattr(settings, 'Travelogue_DIR', 'Travelogue')
+TRAVELOGUE_DIR = getattr(settings, 'TRAVELOGUE_DIR', 'travelogue')
 
 # Look for user function to define file paths
-Travelogue_PATH = getattr(settings, 'Travelogue_PATH', None)
-if Travelogue_PATH is not None:
-    if callable(Travelogue_PATH):
-        get_storage_path = Travelogue_PATH
+TRAVELOGUE_PATH = getattr(settings, 'TRAVELOGUE_PATH', None)
+if TRAVELOGUE_PATH is not None:
+    if callable(TRAVELOGUE_PATH):
+        get_storage_path = TRAVELOGUE_PATH
     else:
-        parts = Travelogue_PATH.split('.')
+        parts = TRAVELOGUE_PATH.split('.')
         module_name = '.'.join(parts[:-1])
         module = import_module(module_name)
         get_storage_path = getattr(module, parts[-1])
 else:
     def get_storage_path(instance, filename):
-        return os.path.join(Travelogue_DIR, 'photos', filename)
+        return os.path.join(TRAVELOGUE_DIR, 'photos', filename)
 
 # Support CACHEDIR.TAG spec for backups for ignoring cache dir.
 # See http://www.brynosaurus.com/cachedir/spec.html
-Travelogue_CACHEDIRTAG = os.path.join(Travelogue_DIR, "photos", "cache", "CACHEDIR.TAG")
-if not default_storage.exists(Travelogue_CACHEDIRTAG):
-    default_storage.save(Travelogue_CACHEDIRTAG, ContentFile(
+TRAVELOGUE_CACHEDIRTAG = os.path.join(TRAVELOGUE_DIR, "photos", "cache", "CACHEDIR.TAG")
+if not default_storage.exists(TRAVELOGUE_CACHEDIRTAG):
+    default_storage.save(TRAVELOGUE_CACHEDIRTAG, ContentFile(
         "Signature: 8a477f597d28d172789f06886806bc55"))
 
 # Orientation necessary mapped to EXIF data
@@ -134,7 +134,7 @@ JPEG_QUALITY_CHOICES = (
     (60, _('Medium')),
     (70, _('Medium-High')),
     (80, _('High')),
-#    (90, _('Very High')),
+    (90, _('Very High')),
 )
 
 # choices for new crop_anchor field in Photo
@@ -192,7 +192,7 @@ class Travelogue(models.Model):
                                     help_text=_('Public Travelogues will be displayed '
                                                 'in the default views.'))
     photos = SortedManyToManyField('Photo',
-                                   related_name='Travelogues',
+                                   related_name='travelogues',
                                    verbose_name=_('photos'),
                                    null=True,
                                    blank=True)
@@ -205,8 +205,8 @@ class Travelogue(models.Model):
     class Meta:
         ordering = ['-date_added']
         get_latest_by = 'date_added'
-        verbose_name = _('Travelogue')
-        verbose_name_plural = _('Travelogues')
+        verbose_name = _('travelogue')
+        verbose_name_plural = _('travelogues')
 
     def __str__(self):
         return self.title
@@ -555,34 +555,34 @@ class Photo(ImageModel):
     def get_absolute_url(self):
         return reverse('travelogue:pl-photo', args=[self.slug])
 
-    def public_Travelogues(self):
+    def public_travelogues(self):
         """Return the public Travelogues to which this photo belongs."""
-        return self.Travelogues.filter(is_public=True)
+        return self.travelogues.filter(is_public=True)
 
-    def get_previous_in_Travelogue(self, Travelogue):
+    def get_previous_in_travelogue(self, travelogue):
         """Find the neighbour of this photo in the supplied Travelogue.
         We assume that the Travelogue and all its photos are on the same site.
         """
         if not self.is_public:
             raise ValueError('Cannot determine neighbours of a non-public photo.')
-        photos = Travelogue.photos.is_public()
+        photos = travelogue.photos.is_public()
         if self not in photos:
-            raise ValueError('Photo does not belong to Travelogue.')
+            raise ValueError('Photo does not belong to travelogue.')
         previous = None
         for photo in photos:
             if photo == self:
                 return previous
             previous = photo
 
-    def get_next_in_Travelogue(self, Travelogue):
+    def get_next_in_travelogue(self, travelogue):
         """Find the neighbour of this photo in the supplied Travelogue.
         We assume that the Travelogue and all its photos are on the same site.
         """
         if not self.is_public:
             raise ValueError('Cannot determine neighbours of a non-public photo.')
-        photos = Travelogue.photos.is_public()
+        photos = travelogue.photos.is_public()
         if self not in photos:
-            raise ValueError('Photo does not belong to Travelogue.')
+            raise ValueError('Photo does not belong to travelogue.')
         matched = False
         for photo in photos:
             if matched:
@@ -610,10 +610,10 @@ class BaseEffect(models.Model):
         abstract = True
 
     def sample_dir(self):
-        return os.path.join(Travelogue_DIR, 'samples')
+        return os.path.join(TRAVELOGUE_DIR, 'samples')
 
     def sample_url(self):
-        return settings.MEDIA_URL + '/'.join([Travelogue_DIR, 'samples', '%s %s.jpg' % (self.name.lower(), 'sample')])
+        return settings.MEDIA_URL + '/'.join([TRAVELOGUE_DIR, 'samples', '%s %s.jpg' % (self.name.lower(), 'sample')])
 
     def sample_filename(self):
         return os.path.join(self.sample_dir(), '%s %s.jpg' % (self.name.lower(), 'sample'))
@@ -745,7 +745,7 @@ class PhotoEffect(BaseEffect):
 
 class Watermark(BaseEffect):
     image = models.ImageField(_('image'),
-                              upload_to=Travelogue_DIR + "/watermarks")
+                              upload_to=TRAVELOGUE_DIR + "/watermarks")
     style = models.CharField(_('style'),
                              max_length=5,
                              choices=WATERMARK_STYLE_CHOICES,
@@ -900,13 +900,13 @@ def init_size_method_map():
 def add_default_site(instance, created, **kwargs):
     """
     Called via Django's signals when an instance is created.
-    In case Travelogue_MULTISITE is False, the current site (i.e.
+    In case TRAVELOGUE_MULTISITE is False, the current site (i.e.
     ``settings.SITE_ID``) will always be added to the site relations if none are
     present.
     """
     if not created:
         return
-    if getattr(settings, 'Travelogue_MULTISITE', False):
+    if getattr(settings, 'TRAVELOGUE_MULTISITE', False):
         return
     if instance.sites.exists():
         return

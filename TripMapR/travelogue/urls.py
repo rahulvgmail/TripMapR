@@ -10,7 +10,7 @@ from .views import PhotoListView, PhotoDetailView, TravelogueListView, \
     PhotoDayArchiveOldView, PhotoMonthArchiveOldView
 
 """NOTE: the url names are changing. In the long term, I want to remove the 'pl-'
-prefix on all urls, and instead rely on an application namespace 'Travelogue'.
+prefix on all urls, and instead rely on an application namespace 'travelogue'.
 
 At the same time, I want to change some URL patterns, e.g. for pagination. Changing the urls
 twice within a few releases, could be confusing, so instead I am updating URLs bit by bit.

@@ -7,12 +7,12 @@ from ..models import Travelogue
 from ..models import Photo
 
 
-@register.inclusion_tag('photologue/tags/next_in_travelogue.html')
+@register.inclusion_tag('travelogue/tags/next_in_travelogue.html')
 def next_in_travelogue(photo, travelogue):
     return {'photo': photo.get_next_in_travelogue(travelogue)}
 
 
-@register.inclusion_tag('photologue/tags/prev_in_travelogue.html')
+@register.inclusion_tag('travelogue/tags/prev_in_travelogue.html')
 def previous_in_travelogue(photo, travelogue):
     return {'photo': photo.get_previous_in_travelogue(travelogue)}
 
