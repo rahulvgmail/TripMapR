@@ -21,3 +21,6 @@ class TravelogueQuerySet(SharedQueries, QuerySet):
 
 class PhotoQuerySet(SharedQueries, QuerySet):
     pass
+
+class TripNoteQuerySet(SharedQueries, QuerySet):
+    pass

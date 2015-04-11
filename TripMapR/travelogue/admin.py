@@ -11,7 +11,7 @@ from django.contrib.admin import helpers
 from django.http import HttpResponseRedirect
 
 from .models import Travelogue, Photo, PhotoEffect, PhotoSize, \
-    Watermark
+    Watermark, Trail, TripNote, TrailPoint
 from .forms import UploadZipForm
 
 MULTISITE = getattr(settings, 'PHOTOLOGUE_MULTISITE', False)

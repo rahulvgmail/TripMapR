@@ -28,6 +28,11 @@ from django.utils.encoding import python_2_unicode_compatible
 from django.core.validators import RegexValidator
 from django.contrib.sites.models import Site
 
+#postgis import
+from django.contrib.gis.db import models as geoModels
+from django.contrib.gis import admin as geoAdmin
+from django.contrib.gis.utils import LayerMapping
+
 # Required PIL classes may or may not be available from the root namespace
 # depending on the installation method used.
 try:
@@ -49,6 +54,12 @@ except ImportError:
 from sortedm2m.fields import SortedManyToManyField
 from model_utils.managers import PassThroughManager
 
+from .utils import EXIF
+from .utils.reflection import add_reflection
+from .utils.watermark import apply_watermark
+from .managers import TravelogueQuerySet, PhotoQuerySet, TripNoteQuerySet
+
+
 # attempt to load the django-tagging TagField from default location,
 # otherwise we substitude a dummy TagField.
 try:
@@ -66,15 +77,7 @@ except ImportError:
             return 'CharField'
     tagfield_help_text = _('Django-tagging was not found, tags will be treated as plain text.')
 
-    # Tell South how to handle this custom field.
-    if django.VERSION[:2] < (1, 7):
-        from south.modelsinspector import add_introspection_rules
-        add_introspection_rules([], ["^travelogue\.models\.TagField"])
 
-from .utils import EXIF
-from .utils.reflection import add_reflection
-from .utils.watermark import apply_watermark
-from .managers import TravelogueQuerySet, PhotoQuerySet
 
 logger = logging.getLogger('travelogue.models')
 
@@ -173,10 +176,134 @@ IMAGE_FILTERS_HELP_TEXT = _('Chain multiple filters using the following pattern 
 
 size_method_map = {}
 
+###RAHUL section
 
-#going to change this to travelogue
+#a point on the trail has a location and a time :-)
 @python_2_unicode_compatible
-class Travelogue(models.Model):
+class TrailPoint(geoModels.Model):
+    timestamp = geoModels.DateTimeField()
+    point = geoModels.PointField(dim=3)
+    objects = geoModels.GeoManager()
+
+    def __unicode__(self):
+        return unicode(self.timestamp)
+
+
+@python_2_unicode_compatible
+class GeoTrack(models.Model):
+    track = geoModels.MultiLineStringField(dim=3)
+    objects = geoModels.GeoManager()
+
+
+#TODO 
+#create trail class
+
+@python_2_unicode_compatible
+class Trail(geoModels.Model):
+    title = geoModels.CharField(max_length=50)
+    description = geoModels.TextField(_('description'),
+                                blank=True)
+    tags = TagField(help_text=tagfield_help_text, 
+                                verbose_name=_('tags'))
+    geoPoints = geoModels.ManyToManyField(TrailPoint, verbose_name=_('geoPoints'),
+                                blank=True,null=True)
+
+
+@python_2_unicode_compatible
+class TripNote(geoModels.Model):
+    date_added = models.DateTimeField(_('date published'), 
+                            default=now)
+    title = models.CharField(_('title'),
+                             max_length=50,
+                             unique=True)
+    story = models.TextField(_('userStroy'),
+                            unique=False,
+                            help_text= ('user story content as html'))
+    slug = models.SlugField(_('slug'),
+                            unique=True,
+                            help_text=_('A "slug" is a unique URL-friendly title for an object.'))
+ 
+    description = models.TextField(_('description'),
+                                   blank=True)
+    is_public = models.BooleanField(_('is public'),
+                                    default=True,
+                                    help_text=_('Public TripNotes will be displayed '
+                                                'in the default views.'))
+
+    tags = TagField(help_text=tagfield_help_text, verbose_name=_('tags'))
+    sites = models.ManyToManyField(Site, verbose_name=_(u'sites'),
+                                   blank=True, null=True)
+
+    #location
+    location_detail = geoModels.ForeignKey(TrailPoint,
+                                null=True,
+                                blank=True,
+                                related_name="%(class)s_related",
+                                verbose_name=_('location_detail'))
+    #lon = models.FloatField()
+    #lat = models.FloatField()
+
+    objects = PassThroughManager.for_queryset_class(TripNoteQuerySet)()
+    geoObjects = geoModels.GeoManager()
+
+    class Meta:
+        ordering = ['-date_added']
+        get_latest_by = 'date_added'
+        verbose_name = _("tripnote")
+        verbose_name_plural = _("tripnotes")
+
+    def __str__(self):
+        return self.title
+    def public_travelogues(self):
+        """Return the public Travelogues to which this note belongs."""
+        return self.travelogues.filter(is_public=True)
+
+    def get_previous_in_travelogue(self, travelogue):
+        """Find the neighbour of this photo in the supplied Travelogue.
+        We assume that the Travelogue and all its photos are on the same site.
+        """
+        if not self.is_public:
+            raise ValueError('Cannot determine neighbours of a non-public photo.')
+        photos = travelogue.photos.is_public()
+        if self not in photos:
+            raise ValueError('Photo does not belong to travelogue.')
+        previous = None    
+
+    def within_boundary(self, geom):
+        return self.filter(point__within=geom)
+        for photo in photos:
+            if photo == self:
+                return previous
+            previous = photo
+
+    def get_next_in_travelogue(self, travelogue):
+        """Find the neighbour of this note in the supplied Travelogue.
+        We assume that the Travelogue and all its photos and notes are on the same site.
+        """
+        if not self.is_public:
+            raise ValueError('Cannot determine neighbours of a non-public photo.')
+        photos = travelogue.photos.is_public()
+        if self not in photos:
+            raise ValueError('Photo does not belong to travelogue.')
+        matched = False
+        for photo in photos:
+            if matched:
+                return photo
+            if photo == self:
+                matched = True
+        return None
+
+    @property
+    def title_slug(self):
+        warnings.warn(
+            DeprecationWarning("`title_slug` field in Photo is being renamed to `slug`. Update your code."))
+        return self.slug
+
+
+
+
+@python_2_unicode_compatible
+class Travelogue(geoModels.Model):
     date_added = models.DateTimeField(_('date published'),
                                       default=now)
     title = models.CharField(_('title'),
@@ -196,12 +323,26 @@ class Travelogue(models.Model):
                                    verbose_name=_('photos'),
                                    null=True,
                                    blank=True)
+
+    notes = SortedManyToManyField('TripNote',
+                                   related_name='travelogues',
+                                   verbose_name=_('tripNote'),
+                                   null=True,
+                                   blank=True)
+
     tags = TagField(help_text=tagfield_help_text, verbose_name=_('tags'))
     sites = models.ManyToManyField(Site, verbose_name=_(u'sites'),
                                    blank=True, null=True)
 
+    geoObjects = geoModels.GeoManager()
+
     objects = PassThroughManager.for_queryset_class(TravelogueQuerySet)()
 
+    geoTrail = models.ForeignKey('Trail',
+                               null=True,
+                               blank=True,
+                               related_name="%(class)s_related",
+                               verbose_name=_('geoTrail'))
     class Meta:
         ordering = ['-date_added']
         get_latest_by = 'date_added'
@@ -217,6 +358,7 @@ class Travelogue(models.Model):
     def latest(self, limit=LATEST_LIMIT, public=True):
         if not limit:
             limit = self.photo_count()
+
         if public:
             return self.public()[:limit]
         else:
@@ -264,7 +406,7 @@ class Travelogue(models.Model):
         return self.slug
 
 
-class ImageModel(models.Model):
+class ImageModel(geoModels.Model):
     image = models.ImageField(_('image'),
                               max_length=IMAGE_FIELD_MAX_LENGTH,
                               upload_to=get_storage_path)
@@ -535,8 +677,15 @@ class Photo(ImageModel):
     tags = TagField(help_text=tagfield_help_text, verbose_name=_('tags'))
     sites = models.ManyToManyField(Site, verbose_name=_(u'sites'),
                                    blank=True, null=True)
+    #location
+    location_detail = geoModels.ForeignKey(TrailPoint,
+                                null=True,
+                                blank=True,
+                                related_name="%(class)s_related",
+                                verbose_name=_('location_detail'))
 
     objects = PassThroughManager.for_queryset_class(PhotoQuerySet)()
+    geoObjects = geoModels.GeoManager()
 
     class Meta:
         ordering = ['-date_added']
@@ -913,3 +1062,5 @@ def add_default_site(instance, created, **kwargs):
     instance.sites.add(Site.objects.get_current())
 post_save.connect(add_default_site, sender=Travelogue)
 post_save.connect(add_default_site, sender=Photo)
+post_save.connect(add_default_site, sender=TrailPoint)
+post_save.connect(add_default_site, sender=TripNote)

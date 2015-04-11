@@ -41,6 +41,7 @@
           <li><a href="{% url 'about' %}">About</a></li>
 
           {% if request.user.is_authenticated %}
+            <li><a href="{% url 'travelogue:pl-travelogue-root' %}">{% trans "Travelogues" %}</a></li>
             <li><a href="{% url 'users:detail' request.user.username  %}">{% trans "My Profile" %}</a></li>
             <li><a href="{% url 'account_logout' %}">{% trans "Logout" %}</a></li>
           {% else %}

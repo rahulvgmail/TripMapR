@@ -30,6 +30,8 @@ class Common(Configuration):
         'django.contrib.messages',
         'django.contrib.staticfiles',
         'django.contrib.sitemaps',
+        'django.contrib.gis',
+
 
         # Useful template tags:
         # 'django.contrib.humanize',
@@ -116,7 +118,7 @@ class Common(Configuration):
 
     # DATABASE CONFIGURATION
     # See: https://docs.djangoproject.com/en/dev/ref/settings/#databases
-    DATABASES = values.DatabaseURLValue('postgres://tripmapr:tripmapr@localhost/tripmapr')
+    DATABASES = values.DatabaseURLValue('postgis://tripmapr:tripmapr@localhost/tripmapr')
     # END DATABASE CONFIGURATION
 
     # CACHING
