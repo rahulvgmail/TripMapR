@@ -2,6 +2,8 @@ from django import forms
 from django.conf import settings
 from django.conf.urls import url
 from django.contrib import admin
+from django.contrib.gis import admin as geoAdmin
+from django.contrib.gis import forms as goeForms
 from django.contrib.sites.models import Site
 from django.contrib import messages
 from django.utils.translation import ungettext, ugettext_lazy as _
@@ -234,6 +236,102 @@ class PhotoAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Photo, PhotoAdmin)
+
+######
+#ading admin for geo fields
+
+class TripNoteAdminForm(goeForms.ModelForm):
+
+    class Meta:
+        model = TripNote
+        if MULTISITE:
+            exclude = []
+        else:
+            exclude = ['sites']
+        if not ENABLE_TAGS:
+            exclude.append('tags')
+
+
+class TripNoteAdmin(geoAdmin.GeoModelAdmin):
+    if ENABLE_TAGS:
+        list_display = ('title', 'date_taken', 'date_added',
+                        'is_public', 'tags', 'view_count', 'location_detail')
+    else:
+        list_display = ('title', 'date_taken', 'date_added',
+                        'is_public', 'view_count', 'location_detail')
+    list_filter = ['date_added', 'is_public']
+    if MULTISITE:
+        list_filter.append('sites')
+    search_fields = ['title', 'slug', 'story']
+    list_per_page = 10
+    prepopulated_fields = {'slug': ('title',)}
+    form = PhotoAdminForm
+    if MULTISITE:
+        filter_horizontal = ['sites']
+    if MULTISITE:
+        actions = ['add_tripnotes_to_current_site', 'remove_tripnotes_from_current_site']
+
+    def formfield_for_manytomany(self, db_field, request, **kwargs):
+        """ Set the current site as initial value. """
+        if db_field.name == "sites":
+            kwargs["initial"] = [Site.objects.get_current()]
+        return super(TripNoteAdmin, self).formfield_for_manytomany(db_field, request, **kwargs)
+
+    def add_tripnotes_to_current_site(modeladmin, request, queryset):
+        current_site = Site.objects.get_current()
+        current_site.photo_set.add(*queryset)
+        msg = ungettext(
+            'The tripnote has been successfully added to %(site)s',
+            'The selected tripnotes have been successfully added to %(site)s',
+            len(queryset)
+        ) % {'site': current_site.name}
+        messages.success(request, msg)
+
+    add_tripnotes_to_current_site.short_description = \
+        _("Add selected tripnotes to the current site")
+
+    def remove_tripnotes_from_current_site(modeladmin, request, queryset):
+        current_site = Site.objects.get_current()
+        current_site.photo_set.remove(*queryset)
+        msg = ungettext(
+            'The photo has been successfully removed from %(site)s',
+            'The selected photos have been successfully removed from %(site)s',
+            len(queryset)
+        ) % {'site': current_site.name}
+        messages.success(request, msg)
+
+    remove_tripnotes_from_current_site.short_description = \
+        _("Remove selected tripnotes from the current site")
+
+
+
+
+admin.site.register(TripNote, TripNoteAdmin)
+
+
+class TrailPointAdminForm(goeForms.ModelForm):
+
+    class Meta:
+        model = TripNote
+        if MULTISITE:
+            exclude = []
+        else:
+            exclude = ['sites']
+    point = goeForms.PointField(widget=
+        goeForms.OSMWidget(attrs={'map_width': 800, 'map_height': 500}))
+
+
+
+class TrailPointAdmin(geoAdmin.OSMGeoAdmin):
+    search_fields = ['timestamp','point'] 
+    list_display = ['timestamp','point']
+
+
+
+admin.site.register(TrailPoint, TrailPointAdmin)
+######################
+
+
 
 
 class PhotoEffectAdmin(admin.ModelAdmin):

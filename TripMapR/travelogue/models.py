@@ -230,6 +230,12 @@ class Trail(geoModels.Model):
 class TripNote(geoModels.Model):
     date_added = models.DateTimeField(_('date published'), 
                             default=now)
+    #TODO debate if date taken should be editable or not
+    date_taken = models.DateTimeField(_('date note captured by user on the field'),
+                                      null=True,
+                                      blank=True,
+                                      editable=True)
+
     title = models.CharField(_('title'),
                              max_length=50,
                              unique=True)
@@ -242,6 +248,9 @@ class TripNote(geoModels.Model):
  
     description = models.TextField(_('description'),
                                    blank=True)
+    view_count = models.PositiveIntegerField(_('view count'),
+                                     default=0,
+                                     editable=False)
     is_public = models.BooleanField(_('is public'),
                                     default=True,
                                     help_text=_('Public TripNotes will be displayed '
@@ -285,7 +294,10 @@ class TripNote(geoModels.Model):
         if self not in photos:
             raise ValueError('Photo does not belong to travelogue.')
         previous = None    
-
+    
+    def increment_count(self):
+        self.view_count += 1
+        models.Model.save(self) 
     def within_boundary(self, geom):
         return self.filter(point__within=geom)
         for photo in photos:
