@@ -1,7 +1,7 @@
 import unittest
 from django.core.exceptions import ValidationError
 from ..models import PhotoSizeCache, PhotoSize
-from .helpers import PhotologueBaseTest
+from .helpers import TravelogueBaseTest
 from .factories import SQUARE_IMAGE_PATH, PORTRAIT_IMAGE_PATH, PhotoFactory
 
 
@@ -14,7 +14,7 @@ class PhotoSizeTest(unittest.TestCase):
         self.assertRaises(ValidationError, s.clean)
 
 
-class ImageResizeTest(PhotologueBaseTest):
+class ImageResizeTest(TravelogueBaseTest):
 
     def setUp(self):
         super(ImageResizeTest, self).setUp()
@@ -125,8 +125,10 @@ class ImageResizeTest(PhotologueBaseTest):
         self.assertEqual(self.ps.get_testPhotoSize_size(), (1000, 1000))
 
 
-class PhotoSizeCacheTest(PhotologueBaseTest):
+
+class PhotoSizeCacheTest(TravelogueBaseTest):
 
     def test(self):
         cache = PhotoSizeCache()
         self.assertEqual(cache.sizes['testPhotoSize'], self.s)
+

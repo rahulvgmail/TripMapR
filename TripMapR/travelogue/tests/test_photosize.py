@@ -1,10 +1,10 @@
 from django.core.exceptions import ValidationError
 
 from .factories import PhotoSizeFactory
-from .helpers import PhotologueBaseTest
+from .helpers import TravelogueBaseTest
 
 
-class PhotoSizeNameTest(PhotologueBaseTest):
+class PhotoSizeNameTest(TravelogueBaseTest):
 
     def test_valid_name(self):
         """We are restricted in what names we can enter."""

@@ -3,13 +3,13 @@
 import os
 from django.conf import settings
 from django.core.files.storage import default_storage
-from ..models import Image, Photo, PHOTOLOGUE_DIR, PHOTOLOGUE_CACHEDIRTAG
+from ..models import Image, Photo, TRAVELOGUE_DIR, TRAVELOGUE_CACHEDIRTAG
 from .factories import LANDSCAPE_IMAGE_PATH, QUOTING_IMAGE_PATH, \
-    GalleryFactory, PhotoFactory
-from .helpers import PhotologueBaseTest
+    TravelogueFactory, PhotoFactory
+from .helpers import TravelogueBaseTest
 
 
-class PhotoTest(PhotologueBaseTest):
+class PhotoTest(TravelogueBaseTest):
 
     def tearDown(self):
         """Delete any extra test files (if created)."""
@@ -30,16 +30,16 @@ class PhotoTest(PhotologueBaseTest):
 
     def test_paths(self):
         self.assertEqual(os.path.normpath(str(self.pl.cache_path())).lower(),
-                         os.path.normpath(os.path.join(PHOTOLOGUE_DIR,
+                         os.path.normpath(os.path.join(TRAVELOGUE_DIR,
                                                        'photos',
                                                        'cache')).lower())
         self.assertEqual(self.pl.cache_url(),
-                         settings.MEDIA_URL + PHOTOLOGUE_DIR + '/photos/cache')
+                         settings.MEDIA_URL + TRAVELOGUE_DIR + '/photos/cache')
 
     def test_cachedir_tag(self):
-        self.assertTrue(default_storage.exists(PHOTOLOGUE_CACHEDIRTAG))
+        self.assertTrue(default_storage.exists(TRAVELOGUE_CACHEDIRTAG))
 
-        content = default_storage.open(PHOTOLOGUE_CACHEDIRTAG).read()
+        content = default_storage.open(TRAVELOGUE_CACHEDIRTAG).read()
         self.assertEqual(content, b"Signature: 8a477f597d28d172789f06886806bc55")
 
     def test_count(self):
@@ -97,7 +97,7 @@ class PhotoTest(PhotologueBaseTest):
         PhotoFactory(title='É', 
             slug='é')
 
-class PhotoManagerTest(PhotologueBaseTest):
+class PhotoManagerTest(TravelogueBaseTest):
 
     """Some tests for the methods on the Photo manager class."""
 
@@ -118,20 +118,20 @@ class PhotoManagerTest(PhotologueBaseTest):
         self.assertEqual(Photo.objects.is_public().count(), 1)
 
 
-class PreviousNextTest(PhotologueBaseTest):
+class PreviousNextTest(TravelogueBaseTest):
 
-    """Tests for the methods that provide the previous/next photos in a gallery."""
+    """Tests for the methods that provide the previous/next photos in a travelogue."""
 
     def setUp(self):
-        """Create a test gallery with 2 photos."""
+        """Create a test travelogue with 2 photos."""
         super(PreviousNextTest, self).setUp()
-        self.test_gallery = GalleryFactory()
+        self.test_travelogue = TravelogueFactory()
         self.pl1 = PhotoFactory()
         self.pl2 = PhotoFactory()
         self.pl3 = PhotoFactory()
-        self.test_gallery.photos.add(self.pl1)
-        self.test_gallery.photos.add(self.pl2)
-        self.test_gallery.photos.add(self.pl3)
+        self.test_travelogue.photos.add(self.pl1)
+        self.test_travelogue.photos.add(self.pl2)
+        self.test_travelogue.photos.add(self.pl3)
 
     def tearDown(self):
         super(PreviousNextTest, self).tearDown()
@@ -140,12 +140,12 @@ class PreviousNextTest(PhotologueBaseTest):
         self.pl3.delete()
 
     def test_previous_simple(self):
-        # Previous in gallery.
-        self.assertEqual(self.pl1.get_previous_in_gallery(self.test_gallery),
+        # Previous in travelogue.
+        self.assertEqual(self.pl1.get_previous_in_travelogue(self.test_travelogue),
                          None)
-        self.assertEqual(self.pl2.get_previous_in_gallery(self.test_gallery),
+        self.assertEqual(self.pl2.get_previous_in_travelogue(self.test_travelogue),
                          self.pl1)
-        self.assertEqual(self.pl3.get_previous_in_gallery(self.test_gallery),
+        self.assertEqual(self.pl3.get_previous_in_travelogue(self.test_travelogue),
                          self.pl2)
 
     def test_previous_public(self):
@@ -153,33 +153,33 @@ class PreviousNextTest(PhotologueBaseTest):
         self.pl2.is_public = False
         self.pl2.save()
 
-        self.assertEqual(self.pl1.get_previous_in_gallery(self.test_gallery),
+        self.assertEqual(self.pl1.get_previous_in_travelogue(self.test_travelogue),
                          None)
         self.assertRaisesMessage(ValueError,
                                  'Cannot determine neighbours of a non-public photo.',
-                                 self.pl2.get_previous_in_gallery,
-                                 self.test_gallery)
-        self.assertEqual(self.pl3.get_previous_in_gallery(self.test_gallery),
+                                 self.pl2.get_previous_in_travelogue,
+                                 self.test_travelogue)
+        self.assertEqual(self.pl3.get_previous_in_travelogue(self.test_travelogue),
                          self.pl1)
 
-    def test_previous_gallery_mismatch(self):
-        """Photo does not belong to the gallery."""
+    def test_previous_travelogue_mismatch(self):
+        """Photo does not belong to the travelogue."""
         self.pl4 = PhotoFactory()
 
         self.assertRaisesMessage(ValueError,
-                                 'Photo does not belong to gallery.',
-                                 self.pl4.get_previous_in_gallery,
-                                 self.test_gallery)
+                                 'Photo does not belong to travelogue.',
+                                 self.pl4.get_previous_in_travelogue,
+                                 self.test_travelogue)
 
         self.pl4.delete()
 
     def test_next_simple(self):
-        # Next in gallery.
-        self.assertEqual(self.pl1.get_next_in_gallery(self.test_gallery),
+        # Next in travelogue.
+        self.assertEqual(self.pl1.get_next_in_travelogue(self.test_travelogue),
                          self.pl2)
-        self.assertEqual(self.pl2.get_next_in_gallery(self.test_gallery),
+        self.assertEqual(self.pl2.get_next_in_travelogue(self.test_travelogue),
                          self.pl3)
-        self.assertEqual(self.pl3.get_next_in_gallery(self.test_gallery),
+        self.assertEqual(self.pl3.get_next_in_travelogue(self.test_travelogue),
                          None)
 
     def test_next_public(self):
@@ -187,22 +187,22 @@ class PreviousNextTest(PhotologueBaseTest):
         self.pl2.is_public = False
         self.pl2.save()
 
-        self.assertEqual(self.pl1.get_next_in_gallery(self.test_gallery),
+        self.assertEqual(self.pl1.get_next_in_travelogue(self.test_travelogue),
                          self.pl3)
         self.assertRaisesMessage(ValueError,
                                  'Cannot determine neighbours of a non-public photo.',
-                                 self.pl2.get_next_in_gallery,
-                                 self.test_gallery)
-        self.assertEqual(self.pl3.get_next_in_gallery(self.test_gallery),
+                                 self.pl2.get_next_in_travelogue,
+                                 self.test_travelogue)
+        self.assertEqual(self.pl3.get_next_in_travelogue(self.test_travelogue),
                          None)
 
-    def test_next_gallery_mismatch(self):
-        """Photo does not belong to the gallery."""
+    def test_next_travelogue_mismatch(self):
+        """Photo does not belong to the travelogue."""
         self.pl4 = PhotoFactory()
 
         self.assertRaisesMessage(ValueError,
-                                 'Photo does not belong to gallery.',
-                                 self.pl4.get_next_in_gallery,
-                                 self.test_gallery)
+                                 'Photo does not belong to travelogue.',
+                                 self.pl4.get_next_in_travelogue,
+                                 self.test_travelogue)
 
         self.pl4.delete()

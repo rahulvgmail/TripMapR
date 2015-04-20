@@ -230,7 +230,7 @@ class PhotoAdmin(admin.ModelAdmin):
         context['adminform'] = helpers.AdminForm(form,
                                                  list([(None, {'fields': form.base_fields})]),
                                                  {})
-        return render(request, 'admin/travlogue/photo/upload_zip.html', context)
+        return render(request, 'admin/travelogue/photo/upload_zip.html', context)
 
 
 admin.site.register(Photo, PhotoAdmin)

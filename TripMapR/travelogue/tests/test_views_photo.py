@@ -5,7 +5,7 @@ from ..models import Photo
 
 class RequestPhotoTest(TestCase):
 
-    urls = 'photologue.tests.test_urls'
+    urls = 'travelogue.tests.test_urls'
 
     def setUp(self):
         super(RequestPhotoTest, self).setUp()
@@ -16,7 +16,7 @@ class RequestPhotoTest(TestCase):
         self.photo.delete()
 
     def test_archive_photo_url_works(self):
-        response = self.client.get('/ptests/photo/')
+        response = self.client.get('/travelogue/photo/')
         self.assertEqual(response.status_code, 200)
 
     def test_archive_photo_empty(self):
@@ -25,40 +25,40 @@ class RequestPhotoTest(TestCase):
 
         Photo.objects.all().update(is_public=False)
 
-        response = self.client.get('/ptests/photo/')
+        response = self.client.get('/travelogue/photo/')
         self.assertEqual(response.status_code, 200)
 
         self.assertEqual(response.context['latest'].count(),
                          0)
 
     def test_paginated_photo_url_works(self):
-        response = self.client.get('/ptests/photolist/')
+        response = self.client.get('/travelogue/photolist/')
         self.assertEqual(response.status_code, 200)
 
     def test_photo_works(self):
-        response = self.client.get('/ptests/photo/fake-photo/')
+        response = self.client.get('/travelogue/photo/fake-photo/')
         self.assertEqual(response.status_code, 200)
 
     def test_archive_year_photo_works(self):
-        response = self.client.get('/ptests/photo/2011/')
+        response = self.client.get('/travelogue/photo/2011/')
         self.assertEqual(response.status_code, 200)
 
     def test_archive_month_photo_works(self):
-        response = self.client.get('/ptests/photo/2011/12/')
+        response = self.client.get('/travelogue/photo/2011/12/')
         self.assertEqual(response.status_code, 200)
 
     def test_archive_day_photo_works(self):
-        response = self.client.get('/ptests/photo/2011/12/23/')
+        response = self.client.get('/travelogue/photo/2011/12/23/')
         self.assertEqual(response.status_code, 200)
 
     def test_detail_photo_works(self):
-        response = self.client.get('/ptests/photo/2011/12/23/fake-photo/')
+        response = self.client.get('/travelogue/photo/2011/12/23/fake-photo/')
         self.assertEqual(response.status_code, 200)
 
 
 class PhotoPaginationTest(TestCase):
 
-    urls = 'photologue.tests.test_urls'
+    urls = 'travelogue.tests.test_urls'
 
     def test_pagination(self):
         photos = []
@@ -67,7 +67,7 @@ class PhotoPaginationTest(TestCase):
                 PhotoFactory(title='photo{0:0>3}'.format(i))
             )
 
-        response = self.client.get('/ptests/photolist/')
+        response = self.client.get('/travelogue/photolist/')
         self.assertEqual(response.status_code, 200)
 
         self.assertEqual(len(response.context['object_list']),
@@ -79,7 +79,7 @@ class PhotoPaginationTest(TestCase):
                          'photo003')
 
         # Now get the second page of results.
-        response = self.client.get('/ptests/photolist/?page=2')
+        response = self.client.get('/travelogue/photolist/?page=2')
         self.assertEqual(response.status_code, 200)
 
         self.assertEqual(len(response.context['object_list']),

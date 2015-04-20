@@ -1,8 +1,8 @@
 from ..models import Image, PhotoEffect
-from .helpers import PhotologueBaseTest
+from .helpers import TravelogueBaseTest
 
 
-class PhotoEffectTest(PhotologueBaseTest):
+class PhotoEffectTest(TravelogueBaseTest):
 
     def test(self):
         effect = PhotoEffect(name='test')

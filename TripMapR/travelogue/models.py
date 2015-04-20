@@ -183,17 +183,27 @@ size_method_map = {}
 class TrailPoint(geoModels.Model):
     timestamp = geoModels.DateTimeField()
     point = geoModels.PointField(dim=3)
+    sites = models.ManyToManyField(Site, verbose_name=_(u'sites'),
+                                   blank=True, null=True)
     objects = geoModels.GeoManager()
 
     def __unicode__(self):
         return unicode(self.timestamp)
 
+    def __str__(self):
+        return unicode(self.timestamp)
 
 @python_2_unicode_compatible
 class GeoTrack(models.Model):
     track = geoModels.MultiLineStringField(dim=3)
+    sites = models.ManyToManyField(Site, verbose_name=_(u'sites'),
+                                   blank=True, null=True)
     objects = geoModels.GeoManager()
 
+    def __str__(self):
+        return unicode("abcd")
+    def __unicode__(self):
+        return unicode("self.timestamp")
 
 #TODO 
 #create trail class
@@ -207,6 +217,13 @@ class Trail(geoModels.Model):
                                 verbose_name=_('tags'))
     geoPoints = geoModels.ManyToManyField(TrailPoint, verbose_name=_('geoPoints'),
                                 blank=True,null=True)
+    sites = models.ManyToManyField(Site, verbose_name=_(u'sites'),
+                                   blank=True, null=True)
+    def __str__(self):
+        return unicode(self.title)
+    def __unicode__(self):
+        return unicode(self.title)
+
 
 
 @python_2_unicode_compatible

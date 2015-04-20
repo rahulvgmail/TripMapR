@@ -1,12 +1,13 @@
 from django.conf.urls import *
-from ..sitemaps import GallerySitemap, PhotoSitemap
+from ..sitemaps import TravelogueSitemap, PhotoSitemap
+
 
 urlpatterns = patterns('',
-                       (r'^ptests/', include('photologue.urls', namespace='photologue')),
-                       )
+              url(r'^travelogue/', include('travelogue.urls', namespace='travelogue')),
+)
 
-sitemaps = {'photologue_galleries': GallerySitemap,
-            'photologue_photos': PhotoSitemap,
+sitemaps = {'travelogue_travelogues': TravelogueSitemap,
+            'travelogue_photos': PhotoSitemap,
             }
 
 urlpatterns += patterns('',

@@ -32,7 +32,7 @@ from .models import Travelogue, Photo
 # in the sitemap, but not photos (e.g. if the photos are displayed with a lightbox).
 
 
-class TravelogeSitemap(Sitemap):
+class TravelogueSitemap(Sitemap):
 
     def items(self):
         # The following code is very basic and will probably cause problems with
