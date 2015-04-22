@@ -181,6 +181,7 @@ size_method_map = {}
 #a point on the trail has a location and a time :-)
 @python_2_unicode_compatible
 class TrailPoint(geoModels.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL)
     timestamp = geoModels.DateTimeField()
     point = geoModels.PointField(dim=3)
     sites = models.ManyToManyField(Site, verbose_name=_(u'sites'),
@@ -188,28 +189,30 @@ class TrailPoint(geoModels.Model):
     objects = geoModels.GeoManager()
 
     def __unicode__(self):
-        return unicode(self.timestamp)
+        return 'self.timestamp'
 
     def __str__(self):
-        return unicode(self.timestamp)
+        return 'self.timestamp'
 
 @python_2_unicode_compatible
 class GeoTrack(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL)
     track = geoModels.MultiLineStringField(dim=3)
     sites = models.ManyToManyField(Site, verbose_name=_(u'sites'),
                                    blank=True, null=True)
     objects = geoModels.GeoManager()
 
     def __str__(self):
-        return unicode("abcd")
+        return "abcd"
     def __unicode__(self):
-        return unicode("self.timestamp")
+        return "self.timestamp"
 
 #TODO 
 #create trail class
 
 @python_2_unicode_compatible
 class Trail(geoModels.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL)
     title = geoModels.CharField(max_length=50)
     description = geoModels.TextField(_('description'),
                                 blank=True)
@@ -220,14 +223,15 @@ class Trail(geoModels.Model):
     sites = models.ManyToManyField(Site, verbose_name=_(u'sites'),
                                    blank=True, null=True)
     def __str__(self):
-        return unicode(self.title)
+        return self.title
     def __unicode__(self):
-        return unicode(self.title)
+        return self.title
 
 
 
 @python_2_unicode_compatible
 class TripNote(geoModels.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL)
     date_added = models.DateTimeField(_('date published'), 
                             default=now)
     #TODO debate if date taken should be editable or not
@@ -333,6 +337,7 @@ class TripNote(geoModels.Model):
 
 @python_2_unicode_compatible
 class Travelogue(geoModels.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL)
     date_added = models.DateTimeField(_('date published'),
                                       default=now)
     title = models.CharField(_('title'),
@@ -436,6 +441,7 @@ class Travelogue(geoModels.Model):
 
 
 class ImageModel(geoModels.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL)
     image = models.ImageField(_('image'),
                               max_length=IMAGE_FIELD_MAX_LENGTH,
                               upload_to=get_storage_path)
